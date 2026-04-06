@@ -619,13 +619,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /* ── FIREBASE INIT ── */
+import ENV from "../config.js";
 const firebaseConfig = {
-  apiKey: "AIzaSyAYIMBpNnGhcy-wzjmUtmOsBo9hU7vfrsc",
-  authDomain: "endocycle-43b86.firebaseapp.com",
-  projectId: "endocycle-43b86",
-  storageBucket: "endocycle-43b86.firebasestorage.app",
-  messagingSenderId: "253560551444",
-  appId: "1:253560551444:web:2ea0d511969ed8c4188f01"
+  apiKey: ENV.FIREBASE_API_KEY,
+  authDomain: ENV.FIREBASE_AUTH_DOMAIN,
+  projectId: ENV.FIREBASE_PROJECT_ID,
+  storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: ENV.FIREBASE_MESSAGING_ID,
+  appId: ENV.FIREBASE_APP_ID
 };
 
 const app  = initializeApp(firebaseConfig);
@@ -1028,3 +1029,4 @@ document.getElementById("catFilter").addEventListener("change", renderFeed);
 
 </body>
 </html>
+
