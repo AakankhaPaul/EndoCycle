@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Post Details</title>
+</head>
+<body>
+
+<h2>Post</h2>
+
+<div id="post"></div>
+
+<h3>Comments</h3>
+<div id="comments"></div>
+
+<input id="commentInput" placeholder="Write a comment">
+<button onclick="addComment()">Post Comment</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { customAlert } from "../js/ui.js";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔁 YOUR CONFIG
+ const firebaseConfig = {
+    apiKey: "AIzaSyAYIMBpNnGhcy-wzjmUtmOsBo9hU7vfrsc",
+    authDomain: "endocycle-43b86.firebaseapp.com",
+    projectId: "endocycle-43b86",
+    storageBucket: "endocycle-43b86.firebasestorage.app",
+    messagingSenderId: "253560551444",
+    appId: "1:253560551444:web:2ea0d511969ed8c4188f01"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// GET POST ID FROM URL
+const urlParams = new URLSearchParams(window.location.search);
+const postId = urlParams.get('id');
+
+// LOAD POST
+async function loadPost() {
+  const docRef = doc(db, "posts", postId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    document.getElementById("post").innerHTML = `
+      <h3>${data.title}</h3>
+      <p>${data.content}</p>
+
+      <button onclick="startChat()">Message User</button>
+    `;
+  }
+}
+
+// LOAD COMMENTS
+async function loadComments() {
+  const querySnapshot = await getDocs(collection(db, "posts", postId, "comments"));
+
+  let output = "";
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    output += `<p>${data.text}</p><hr>`;
+  });
+
+  document.getElementById("comments").innerHTML = output;
+}
+
+window.startChat = function() {
+  const chatId = postId; // simple for now
+  window.location.href = "chat.html?id=" + chatId;
+}
+
+// ADD COMMENT
+window.addComment = async function() {
+  const text = document.getElementById("commentInput").value;
+
+  await addDoc(collection(db, "posts", postId, "comments"), {
+    text: text,
+    time: new Date()
+  });
+
+  customAlert("Comment added!");
+  loadComments();
+}
+
+loadPost();
+loadComments();
+
+</script>
+
+</body>
+</html>
+
+

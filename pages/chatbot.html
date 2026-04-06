@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>EndoCycle AI Assistant</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("../images/endoback.jpeg") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: linear-gradient(to right, #ffffffcc, #fff0f5cc);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 40px;
+    }
+
+    .logo span {
+      font-size: 22px;
+      font-weight: 600;
+      color: #E381B5;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 25px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #E381B5;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #d45a9f;
+    }
+
+    /* CHAT CONTAINER */
+    .chat-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 800px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: linear-gradient(45deg, #E381B5, #f5a3c7);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 18px;
+      border-radius: 20px;
+      line-height: 1.5;
+      font-size: 15px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #E381B5;
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: #fdf2f8;
+      border: 1px solid #fce7f3;
+      color: #333;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message.bot strong {
+        color: #d45a9f;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      background: #fdf2f8;
+      border: 1px solid #fce7f3;
+      padding: 12px 18px;
+      border-radius: 20px;
+      border-bottom-left-radius: 5px;
+      color: #888;
+      font-style: italic;
+      font-size: 14px;
+    }
+
+    .chat-input-area {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid #f3f4f6;
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 15px;
+      border: 1px solid #e5e7eb;
+      border-radius: 25px;
+      outline: none;
+      font-size: 15px;
+      font-family: inherit;
+      color: #555;
+      transition: border-color 0.3s;
+    }
+
+    .chat-input-area input:focus {
+      border-color: #E381B5;
+    }
+
+    .send-btn {
+      background: linear-gradient(45deg, #E381B5, #f5a3c7);
+      color: white;
+      border: none;
+      padding: 0 25px;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.3s, transform 0.2s;
+    }
+
+    .send-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    
+    .send-btn:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Scrollbar styling */
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
+    }
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #fbcfe8;
+      border-radius: 4px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: #f9a8d4;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">
+    <img src="../images/endologo-removebg-preview.png">
+    <span>EndoCycle</span>
+  </div>
+  <div class="nav-links">
+    <a href="home.html">Home</a>
+    <a href="feed.html">Feed</a>
+    <a href="tracker.html">Tracker</a>
+    <a href="chat.html">Messages</a>
+    <a href="chatbot.html" style="color: #d45a9f; border-bottom: 2px solid #d45a9f;">AI Assistant</a>
+    <a href="#" id="logout-btn">Logout</a>
+  </div>
+</div>
+
+<!-- CHAT WRAPPER -->
+<div class="chat-wrapper">
+  <div class="chat-container">
+    <div class="chat-header">
+      🌸 EndoCycle AI Health Assistant
+    </div>
+    
+    <div class="chat-messages" id="chat-messages">
+      <div class="message bot">
+        Hi there! I am your EndoCycle AI Assistant. I can help answer questions related to menstrual health, reproductive health, cycle tracking, and conditions like Endometriosis. How can I support you today? 🌸<br><br>
+        <span style="font-size: 12px; color: #888;">Note: I provide information, not medical diagnoses. Always consult a healthcare professional for serious concerns.</span>
+      </div>
+      <div class="typing-indicator" id="typing-indicator">AI is thinking...</div>
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" id="user-input" placeholder="Ask me anything about your cycle or health..." autocomplete="off">
+      <button class="send-btn" id="send-btn">Send</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+
+// --- CONFIG (API keys loaded from central config.js) ---
+import ENV from "../config.js";
+
+// --- FIREBASE AUTHENTICATION (for consistency) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: ENV.FIREBASE_API_KEY,
+  authDomain: ENV.FIREBASE_AUTH_DOMAIN,
+  projectId: ENV.FIREBASE_PROJECT_ID,
+  storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: ENV.FIREBASE_MESSAGING_ID,
+  appId: ENV.FIREBASE_APP_ID
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "../index.html"; 
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    signOut(auth).then(() => {
+        window.location.href = "../index.html";
+    });
+});
+
+
+// --- GEMINI AI INTEGRATION ---
+import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+// API Key loaded from config.js
+const genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY);
+
+// Define System Instructions for the specialized AI role
+const systemInstruction = `You are an empathetic, knowledgeable, and caring AI assistant specializing in female menstrual and reproductive health. 
+Your primary app is called "EndoCycle", which helps women track their cycles and conditions like Endometriosis or PCOS.
+Provide safe, factual, comforting, and clear advice. 
+Use a warm, supportive tone. You can use occasional emojis like 🌸, 💖, or ✨.
+Keep answers well-structured using short paragraphs, bullet points when necessary, and bold text for key terms.
+CRITICAL RULE: Always remind the user that you are an AI and they should consult a healthcare professional or doctor for serious medical concerns or accurate diagnosis.`;
+
+let chatSession;
+
+async function initChat() {
+    try {
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-2.5-flash"
+        });
+        chatSession = model.startChat({
+            history: [
+                {
+                    role: "user",
+                    parts: [{ text: "System Instruction: " + systemInstruction + " Acknowledge this." }]
+                },
+                {
+                    role: "model",
+                    parts: [{ text: "Understood. I am your EndoCycle AI Assistant." }]
+                }
+            ],
+        });
+    } catch (e) {
+        console.error("Error initializing model:", e);
+    }
+}
+
+initChat();
+
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const typingIndicator = document.getElementById('typing-indicator');
+
+// Parse markdown-like bolding **text** to HTML <strong>text</strong>
+function formatMessage(text) {
+    // Replace **bold** with <strong>bold</strong>
+    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Replace *italic* with <em>italic</em>
+    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Replace newlines with <br>
+    formatted = formatted.replace(/\n/g, '<br>');
+    return formatted;
+}
+
+function appendMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}`;
+    msgDiv.innerHTML = formatMessage(text);
+    
+    // Insert before typing indicator
+    chatMessages.insertBefore(msgDiv, typingIndicator);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function handleSend() {
+    const text = userInput.value.trim();
+    if (!text) return;
+    
+    // Disable inputs
+    userInput.value = '';
+    userInput.disabled = true;
+    sendBtn.disabled = true;
+    
+    // User message
+    appendMessage(text, 'user');
+    
+    // Show typing
+    typingIndicator.style.display = 'block';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    try {
+        const result = await chatSession.sendMessage(text);
+        const responseText = result.response.text();
+        
+        // Hide typing
+        typingIndicator.style.display = 'none';
+        
+        // Bot message
+        appendMessage(responseText, 'bot');
+    } catch (error) {
+        console.error("AI Error:", error);
+        typingIndicator.style.display = 'none';
+        appendMessage("Error: " + error.message, 'bot');
+    }
+    
+    // Enable inputs
+    userInput.disabled = false;
+    sendBtn.disabled = false;
+    userInput.focus();
+}
+
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        handleSend();
+    }
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Endo Book</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- PageFlip JS -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("../images/endoback.jpeg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: linear-gradient(to right, #ffffffcc, #fff0f5cc);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 40px;
+    }
+
+    .logo span {
+      font-size: 22px;
+      font-weight: 600;
+      color: #E381B5;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 25px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #E381B5;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #d45a9f;
+    }
+
+    /* ENDO BOOK STYLES */
+    .book-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 60px auto;
+    }
+
+    .book-container {
+      width: 800px;
+      height: 500px;
+      box-shadow: 0 20px 50px rgba(136, 14, 79, 0.2);
+    }
+
+    .page {
+      background-color: #fdf5f6; /* vintage pale pink */
+      box-shadow: inset 0 0 30px rgba(136, 14, 79, 0.05);
+      border: 1px solid #f8bbd0;
+      overflow: hidden;
+    }
+
+    .page.-left {
+      border-right: 1px solid rgba(136, 14, 79, 0.1);
+      box-shadow: inset -10px 0 20px rgba(136, 14, 79, 0.03);
+    }
+
+    .page.-right {
+      border-left: 1px solid rgba(136, 14, 79, 0.1);
+      box-shadow: inset 10px 0 20px rgba(136, 14, 79, 0.03);
+    }
+
+    .page-cover {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0); /* vintage pinkish style */
+      color: #880e4f; /* maroonish pink */
+      box-shadow: inset 0 0 50px rgba(136, 14, 79, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 3px solid #d81b60; /* maroonish pink border */
+      border-radius: 2px;
+    }
+
+    .page-cover h1 {
+      font-size: 50px;
+      font-family: 'Playfair Display', serif; /* vintage font */
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+      margin-bottom: 10px;
+      text-align: center;
+      color: #880e4f;
+    }
+    
+    .page-cover p {
+      font-style: italic;
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: #880e4f;
+    }
+
+    .page-cover-top {
+      background-color: #f8c8d8 !important; /* Vintage pink fallback */
+      background-image: url('../images/book-cover.jpg') !important;
+      background-position: center center !important;
+      background-repeat: no-repeat !important;
+      background-size: cover !important;
+      border: 3px solid #ad1457 !important;
+    }
+
+    .page-cover-top .page-content {
+      justify-content: flex-start !important;
+      padding-top: 18% !important; /* Position perfectly within the plate */
+    }
+
+    .page-cover-top h1 {
+      display: none !important;
+    }
+
+    .page-cover-top p {
+      display: none !important; /* Hide subtitle to feature the design */
+    }
+
+    .page-content {
+      padding: 30px 40px;
+      color: #880e4f; /* maroonish pink text */
+      font-family: 'Playfair Display', serif; /* vintage font */
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: hidden;
+    }
+
+    .page-content h2 {
+      margin-top: 0;
+      color: #880e4f;
+      border-bottom: 2px solid #f8bbd0;
+      padding-bottom: 10px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .chapter-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ad1457;
+      margin-bottom: 5px;
+    }
+
+    .page-content h3 {
+      font-size: 20px;
+      margin-top: 5px;
+      color: #880e4f;
+    }
+
+    .page-content ul {
+      padding-left: 20px;
+    }
+
+    .page-content li {
+      margin-bottom: 12px;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .page-content p {
+      line-height: 1.5;
+      font-size: 15px;
+      color: #880e4f;
+    }
+
+    .toc {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .toc li {
+      margin-bottom: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .toc a {
+      color: #880e4f;
+      text-decoration: none;
+      border-bottom: 1px dashed #880e4f;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .toc a:hover {
+      color: #d81b60;
+      border-bottom: 1px solid #d81b60;
+    }
+
+    .book-controls {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .book-controls button {
+      padding: 10px 25px;
+      background: #880e4f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+      transition: 0.2s;
+      box-shadow: 0 4px 6px rgba(136,14,79,0.2);
+    }
+
+    .book-controls button:hover {
+      background: #c2185b;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+  <div class="logo">
+    <img src="../images/endologo-removebg-preview.png">
+    <span>EndoCycle</span>
+  </div>
+
+  <div class="nav-links">
+    <a href="home.html">Home</a>
+    <a href="feed.html">Feed</a>
+    <a href="tracker.html">Tracker</a>
+    <a href="chat.html">Messages</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+
+</div>
+
+
+<!-- ENDO BOOK SECTION -->
+<div class="book-section">
+  
+  <div class="book-container">
+    <div id="endo-book">
+      
+      <!-- Cover -->
+      <div class="page page-cover page-cover-top">
+        <div class="page-content" style="background: none; box-shadow: none; align-items:center; display: flex; flex-direction:column; border: none;">
+          <h1>EndoBook</h1>
+          <p>The Ultimate Guide to Menstrual Health</p>
+        </div>
+      </div>
+      
+      <!-- Page 1: TOC -->
+      <div class="page">
+        <div class="page-content">
+          <h2>Table of Contents</h2>
+          <ul class="toc">
+            <li><a onclick="turnTo(2)">1. PCOD vs PCOS</a></li>
+            <li><a onclick="turnTo(3)">2. Endometriosis</a></li>
+            <li><a onclick="turnTo(4)">3. PMDD & Fibroids</a></li>
+            <li><a onclick="turnTo(5)">4. Adenomyosis</a></li>
+            <li><a onclick="turnTo(6)">5. Sanitation Practices</a></li>
+            <li><a onclick="turnTo(8)">6. Toxic Shock Syndrome</a></li>
+            <li><a onclick="turnTo(9)">7. Random Fun Facts</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Page 2: PCOD vs PCOS -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 1</h2>
+          <h3>PCOD vs PCOS</h3>
+          <p><strong>PCOD (Polycystic Ovarian Disease):</strong> A hormonal imbalance leading to immature eggs turning into cysts inside the ovaries. It is often manageable with dedicated diet and exercise changes.</p>
+          <p><strong>PCOS (Polycystic Ovary Syndrome):</strong> A more severe metabolic disorder affecting hormones, causing irregular periods, excessive bodily hair growth, and potential fertility issues. Medical attention and specific medication are frequently recommended to keep insulin and hormones in check.</p>
+        </div>
+      </div>
+      
+      <!-- Page 3: Endometriosis -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 2</h2>
+          <h3>Endometriosis</h3>
+          <p>A chronic condition where tissue similar to the lining of the uterus grows outside the uterus.</p>
+          <p><strong>Symptoms:</strong> Severe pelvic pain, incredibly heavy periods, pain with bowel movements or urination, and potential infertility.</p>
+          <p>It affects roughly 10% of reproductive-age women globally. Diagnosis typically takes 7-10 years due to the normalization of severe period pain in society.</p>
+        </div>
+      </div>
+      
+      <!-- Page 4: PMDD & Fibroids -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 3</h2>
+          <h3>PMDD & Uterine Fibroids</h3>
+          <p><strong>PMDD (Premenstrual Dysphoric Disorder):</strong> A severe, debilitating extension of PMS. Causes extreme mood shifts, deep sadness, anger, and irritability that disrupt daily life drastically prior to menstruation.</p>
+          <p><strong>Uterine Fibroids:</strong> Noncancerous growths of the uterus that often appear during childbearing years. They can vary dramatically in size and cause heavy menstrual bleeding, prolonged periods, and intense pelvic pressure.</p>
+        </div>
+      </div>
+      
+      <!-- Page 5: Adenomyosis -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 4</h2>
+          <h3>Adenomyosis</h3>
+          <p>A condition where the inner lining of the uterus (the endometrium) breaks through the muscle wall of the uterus (the myometrium).</p>
+          <p>This condition can cause menstrual cramps, lower abdominal pressure, and bloating before menstrual periods and can lead to extremely heavy bleeding. It is often confused with fibroids but involves entirely different tissue dynamics.</p>
+        </div>
+      </div>
+      
+      <!-- Page 6: Sanitation 1 -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 5</h2>
+          <h3>Sanitation Practices (Part 1)</h3>
+          <ul>
+            <li><strong>Pads:</strong> Change every 4-6 hours. Leaving them longer allows bacteria to multiply rapidly, leading to odor and potential infections. Never flush them, as they will expand and ruin plumbing.</li>
+            <li><strong>Tampons:</strong> Change every 4-8 hours to reduce TSS risk. Always start with the lowest absorbency necessary for your flow.</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Page 7: Sanitation 2 -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 5.5</h2>
+          <h3>Sanitation Practices (Part 2)</h3>
+          <ul>
+            <li><strong>Menstrual Cups:</strong> Empty every 8-12 hours depending on flow. High-quality silicone cups can last years. Sterilize by boiling for 5-10 minutes between your cycles.</li>
+            <li><strong>Period Underwear:</strong> Change every 10-12 hours. Rinse in cold water first so blood doesn't stain, then machine wash on cold without fabric softeners.</li>
+            <li><em>Always wash hands thoroughly before and after handling any menstrual product!</em></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Page 8: TSS -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 6</h2>
+          <h3>Toxic Shock Syndrome (TSS)</h3>
+          <p>A rare, life-threatening complication of certain bacterial infections (Staph/Strep). It's primarily associated with superabsorbent tampons left in for too long, creating a breeding ground for toxins.</p>
+          <p><strong>Symptoms:</strong> Sudden high fever, low blood pressure, vomiting, muscle aches, and a rash resembling a sunburn on your palms or soles.</p>
+        </div>
+      </div>
+      
+      <!-- Page 9: Fun Facts -->
+      <div class="page">
+        <div class="page-content">
+          <h2 class="chapter-title">Chapter 7</h2>
+          <h3>Random Fun Facts 🧠</h3>
+          <ul>
+            <li>Periods can literally get worse when it's cold! Cold weather constricts blood vessels, increasing cramp pain.</li>
+            <li>On average, you only lose about 2-3 tablespoons of blood per entire cycle.</li>
+            <li>Due to hormonal fluctuations, your vocal cords actually swell—slightly changing the tone of your voice during your period!</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Back cover -->
+      <div class="page page-cover page-cover-bottom">
+        <div class="page-content" style="background: none; box-shadow: none; align-items:center; display: flex; flex-direction:column; justify-content:center; border: none;">
+          <h1>The End</h1>
+          <p>Stay Healthy with EndoCycle ❤️</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="book-controls">
+    <button id="btn-prev">⬅️ Previous Page</button>
+    <button id="btn-next">Next Page ➡️</button>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAYIMBpNnGhcy-wzjmUtmOsBo9hU7vfrsc",
+  authDomain: "endocycle-43b86.firebaseapp.com",
+  projectId: "endocycle-43b86",
+  storageBucket: "endocycle-43b86.firebasestorage.app",
+  messagingSenderId: "253560551444",
+  appId: "1:253560551444:web:2ea0d511969ed8c4188f01"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔐 CHECK LOGIN
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "../index.html"; 
+  }
+});
+
+// 🚪 LOGOUT
+window.logout = function() {
+  signOut(auth);
+  window.location.href = "../index.html";
+};
+
+// 📖 BOOK INITIALIZATION
+window.addEventListener('DOMContentLoaded', () => {
+    // Initialize the PageFlip library
+    const pageFlip = new St.PageFlip(document.getElementById('endo-book'), {
+        width: 400, // base page width
+        height: 500, // base page height
+        size: "stretch",
+        minWidth: 315,
+        maxWidth: 1000,
+        minHeight: 420,
+        maxHeight: 1350,
+        maxShadowOpacity: 0.5,
+        showCover: true,
+        mobileScrollSupport: false
+    });
+
+    // Load pages 
+    pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+    // Flip to previous page
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        pageFlip.flipPrev();
+    });
+
+    // Flip to next page
+    document.getElementById('btn-next').addEventListener('click', () => {
+        pageFlip.flipNext();
+    });
+
+    // Global turnTo function for TOC
+    window.turnTo = function(pageNumber) {
+        pageFlip.turnToPage(pageNumber);
+    }
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Post – EndoCycle</title>
+  <meta name="description" content="Share your query, experience or story with the EndoCycle community.">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:      #E381B5;
+      --pink-dark: #c9629c;
+      --pink-light:#f5a3c7;
+      --pink-pale: #fff0f5;
+      --rose:      #ffebf3;
+      --text:      #3d2030;
+      --muted:     #9a7a8a;
+      --border:    #f0d6e5;
+      --glass:     rgba(255,255,255,0.80);
+      --shadow:    0 12px 40px rgba(180,60,110,0.18);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url("../images/endoback.jpeg") no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 40px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 20px rgba(180,60,110,0.10);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo img { width: 38px; }
+    .logo span { font-size: 21px; font-weight: 700; color: var(--pink); }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      text-decoration: none; color: var(--pink);
+      font-weight: 500; font-size: 14px; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--pink-dark); }
+
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 36px 16px 70px;
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 22px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--pink); }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(22px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 36px 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .card-header .icon-wrap {
+      width: 58px; height: 58px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      box-shadow: 0 6px 18px rgba(227,129,181,0.4);
+    }
+    .card-header .icon-wrap i { font-size: 22px; color: white; }
+    .card-header h1 { font-size: 22px; font-weight: 700; color: var(--text); }
+    .card-header p { font-size: 13px; color: var(--muted); margin-top: 5px; }
+
+    /* ── FORM FIELDS ── */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pink-dark);
+      margin-bottom: 7px;
+    }
+    .field label .req { color: #e84393; margin-left: 2px; }
+
+    .field input[type="text"],
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--pink-pale);
+      outline: none;
+      transition: border-color 0.22s, box-shadow 0.22s;
+    }
+    .field input[type="text"]:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(227,129,181,0.18);
+    }
+    .field textarea {
+      resize: vertical;
+      min-height: 130px;
+      line-height: 1.6;
+    }
+
+    /* Multi-select tags for category feel */
+    .field select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23E381B5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+    }
+
+    /* Char counter */
+    .char-row {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .char-row.warn { color: #e84393; }
+
+    /* Tip box */
+    .tip-box {
+      background: linear-gradient(135deg, #fff4f9, #ffe8f3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.55;
+    }
+    .tip-box i { color: var(--pink); margin-top: 2px; flex-shrink: 0; }
+
+    /* Anonymous toggle row */
+    .anon-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--rose);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      margin-bottom: 22px;
+      transition: background 0.18s;
+      user-select: none;
+    }
+    .anon-row:hover { background: #ffe0f0; }
+    .anon-toggle {
+      position: relative;
+      width: 42px; height: 24px;
+      flex-shrink: 0;
+    }
+    .anon-toggle input { opacity: 0; width: 0; height: 0; }
+    .anon-slider {
+      position: absolute; inset: 0;
+      background: #ddd;
+      border-radius: 24px;
+      transition: background 0.2s;
+    }
+    .anon-slider::before {
+      content: "";
+      position: absolute;
+      width: 18px; height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+    .anon-toggle input:checked + .anon-slider { background: var(--pink); }
+    .anon-toggle input:checked + .anon-slider::before { transform: translateX(18px); }
+    .anon-text h4 { font-size: 13px; font-weight: 600; color: var(--text); }
+    .anon-text p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: opacity 0.2s, transform 0.18s, box-shadow 0.2s;
+      box-shadow: 0 6px 20px rgba(227,129,181,0.4);
+      letter-spacing: 0.3px;
+    }
+    .btn-submit:hover { opacity: 0.90; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(227,129,181,0.48); }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; pointer-events: none; }
+
+    /* ── SUCCESS OVERLAY ── */
+    .success-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(255,240,245,0.92);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .success-overlay.show { display: flex; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .success-icon {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 30px rgba(227,129,181,0.4);
+      animation: popIn 0.5s cubic-bezier(.4,2,.6,1);
+    }
+    @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+    .success-icon i { font-size: 36px; color: white; }
+    .success-overlay h2 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .success-overlay p { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
+    .btn-back-feed {
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: white; border: none;
+      padding: 13px 30px; border-radius: 14px;
+      font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-back-feed:hover { opacity: 0.88; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: white; padding: 12px 24px; border-radius: 30px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(180,60,110,0.3);
+      transition: transform 0.35s cubic-bezier(.4,2,.6,1), opacity 0.35s;
+      opacity: 0; z-index: 9999; pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 600px) {
+      .navbar { padding: 12px 18px; }
+      .card { padding: 24px 18px 20px; }
+      .page-wrap { padding: 22px 10px 60px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="home.html" class="logo">
+    <img src="../images/endologo-removebg-preview.png" alt="EndoCycle Logo">
+    <span>EndoCycle</span>
+  </a>
+  <div class="nav-links">
+    <a href="home.html">Home</a>
+    <a href="feed.html">Feed</a>
+    <a href="tracker.html">Tracker</a>
+    <a href="chat.html">Messages</a>
+    <a href="chatbot.html">AI Assistant</a>
+    <a href="#" id="logoutBtn">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Back link -->
+  <a href="feed.html" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i> Back to Feed
+  </a>
+
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="icon-wrap"><i class="fa-solid fa-pen-nib"></i></div>
+      <h1>Create a Post</h1>
+      <p>Ask the community, share an experience, or start a conversation.</p>
+    </div>
+
+    <!-- Tip -->
+    <div class="tip-box">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Be kind and respectful. You're in a safe space — your identity can stay anonymous if you prefer.</span>
+    </div>
+
+    <!-- Title -->
+    <div class="field">
+      <label for="postTitle">Title <span class="req">*</span></label>
+      <input type="text" id="postTitle" placeholder="What's on your mind? Give it a title…" maxlength="150">
+      <div class="char-row" id="titleCharCount">0 / 150</div>
+    </div>
+
+    <!-- Content -->
+    <div class="field">
+      <label for="postContent">Your Post <span class="req">*</span></label>
+      <textarea id="postContent" placeholder="Share your query, story, or experience in detail…" maxlength="2000"></textarea>
+      <div class="char-row" id="contentCharCount">0 / 2000</div>
+    </div>
+
+    <!-- Category -->
+    <div class="field">
+      <label for="postCategory">Category</label>
+      <select id="postCategory">
+        <option value="General">General</option>
+        <option value="Endometriosis">Endometriosis</option>
+        <option value="PCOS">PCOS</option>
+        <option value="PCOD">PCOD</option>
+        <option value="Adenomyosis">Adenomyosis</option>
+        <option value="Uterine Fibroids">Uterine Fibroids (Leiomyoma)</option>
+        <option value="PID">Pelvic Inflammatory Disease (PID)</option>
+        <option value="POI">Primary Ovarian Insufficiency (POI)</option>
+        <option value="Menopause">Menopause</option>
+        <option value="Dysmenorrhea">Dysmenorrhea</option>
+        <option value="Amenorrhea">Amenorrhea</option>
+        <option value="Menorrhagia">Menorrhagia</option>
+        <option value="Oligomenorrhea">Oligomenorrhea</option>
+        <option value="Metrorrhagia">Metrorrhagia</option>
+        <option value="PMDD">PMDD</option>
+        <option value="Hypothalamic Amenorrhea">Hypothalamic Amenorrhea</option>
+        <option value="Pain">Pain Management</option>
+        <option value="Spotting">Spotting</option>
+        <option value="Vaginal Discharge">Vaginal Discharge</option>
+      </select>
+    </div>
+
+    <!-- Anonymous toggle -->
+    <label class="anon-row" for="postAnon">
+      <label class="anon-toggle">
+        <input type="checkbox" id="postAnon">
+        <span class="anon-slider"></span>
+      </label>
+      <div class="anon-text">
+        <h4>🙈 Post Anonymously</h4>
+        <p>Your name will be hidden — the community will see "Anonymous"</p>
+      </div>
+    </label>
+
+    <!-- Submit -->
+    <button class="btn-submit" id="submitBtn">
+      <i class="fa-solid fa-paper-plane"></i> Publish Post
+    </button>
+
+  </div>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+  <h2>Post Published! 🌸</h2>
+  <p>Your post is live. The community can now see and respond to it.</p>
+  <button class="btn-back-feed" onclick="window.location.href='feed.html'">
+    <i class="fa-solid fa-arrow-left"></i> Back to Feed
+  </button>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+/* ── FIREBASE ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyAYIMBpNnGhcy-wzjmUtmOsBo9hU7vfrsc",
+  authDomain: "endocycle-43b86.firebaseapp.com",
+  projectId: "endocycle-43b86",
+  storageBucket: "endocycle-43b86.firebasestorage.app",
+  messagingSenderId: "253560551444",
+  appId: "1:253560551444:web:2ea0d511969ed8c4188f01"
+};
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+/* ── AUTH CHECK ── */
+onAuthStateChanged(auth, user => {
+  if (!user) { window.location.href = "../index.html"; return; }
+  currentUser = user;
+});
+
+document.getElementById("logoutBtn").onclick = () => {
+  signOut(auth); window.location.href = "../index.html";
+};
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+/* ── CHAR COUNTERS ── */
+const titleEl   = document.getElementById("postTitle");
+const contentEl = document.getElementById("postContent");
+const titleCC   = document.getElementById("titleCharCount");
+const contentCC = document.getElementById("contentCharCount");
+
+titleEl.addEventListener("input", () => {
+  const n = titleEl.value.length;
+  titleCC.textContent = `${n} / 150`;
+  titleCC.classList.toggle("warn", n > 130);
+});
+
+contentEl.addEventListener("input", () => {
+  const n = contentEl.value.length;
+  contentCC.textContent = `${n} / 2000`;
+  contentCC.classList.toggle("warn", n > 1800);
+});
+
+/* ── SUBMIT ── */
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  if (!currentUser) return;
+
+  const title    = titleEl.value.trim();
+  const content  = contentEl.value.trim();
+  const category = document.getElementById("postCategory").value;
+  const anon     = document.getElementById("postAnon").checked;
+
+  if (!title)   { showToast("Please add a title 📝"); titleEl.focus();   return; }
+  if (!content) { showToast("Please write something 💬"); contentEl.focus(); return; }
+
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publishing…';
+
+  try {
+    await addDoc(collection(db, "posts"), {
+      title,
+      content,
+      category,
+      anonymous:  anon,
+      authorId:   currentUser.uid,
+      authorName: anon
+        ? "Anonymous"
+        : (currentUser.displayName || currentUser.email?.split("@")[0] || "User"),
+      upvotes:   [],
+      downvotes: [],
+      createdAt: serverTimestamp()
+    });
+
+    // Show success overlay
+    document.getElementById("successOverlay").classList.add("show");
+
+    // Auto-redirect after 3s
+    setTimeout(() => { window.location.href = "feed.html"; }, 3000);
+
+  } catch (e) {
+    console.error(e);
+    showToast("Error publishing. Please try again.");
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish Post';
+  }
+});
+</script>
+
+</body>
+</html>

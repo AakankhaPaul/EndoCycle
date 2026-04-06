@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>EndoCycle Tracker</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+  <!-- FULLCALENDAR -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 10px;  
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 20px;
+
+      /* YOUR BACKGROUND */
+      background: url("../images/endoback.jpeg") no-repeat center center fixed;
+      background-size: cover;
+      background-position: center;
+    }
+
+    td{
+        color: #E381B5;
+    }
+
+    th{
+        color: #E381B5;
+    }
+
+    /* LOGO */
+    .logo {
+      position: relative;
+      top: -100px;
+      left: -580px;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 40px;
+      color: #f4b9d8;
+      margin-bottom: 30px;
+      margin-top: 10px;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: flex-start;
+      align-items: stretch;
+      position: relative;
+      top: -200px;
+    }
+
+    .box{
+        flex: 0 0 600px;
+        height: 600px;
+    }
+
+    /* BIGGER CALENDAR BOX */
+    .calendar-box {
+      background: linear-gradient(to bottom, #ffffff, #fff0f5); backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    /* BIGGER JOURNAL BOX */
+    .journal {
+      background: linear-gradient(to bottom, #ffffff, #fff0f5); backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 25px;
+      overflow-y: auto; /* SCROLL ONLY HERE */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .journal h3 {
+      color: #E381B5;
+      margin-bottom: 10px;
+      font-size: 30px;
+      margin-top: 0;
+    }
+
+    .entry {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #E381B5;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    /* CALENDAR BUTTONS */
+    .fc .fc-button {
+      background: linear-gradient(45deg, #E381B5, #f5a3c7) !important;
+      border: none !important;
+      border-radius: 10px !important;
+    }
+
+    .fc-toolbar-title {
+      color: #E381B5;
+      font-size: 26px !important;
+    }
+
+    /* REMOVE SCROLL FROM CALENDAR */
+    #calendar {
+      max-height: none !important;
+    }
+
+    /* 🌸 CUSTOM SCROLLBAR (JOURNAL) */
+    .journal::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .journal::-webkit-scrollbar-track {
+      background: #ffe6f0;
+      border-radius: 10px;
+    }
+
+    .journal::-webkit-scrollbar-thumb {
+      background: linear-gradient(#E381B5, #f5a3c7);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+
+<!-- LOGO (PUT YOUR FILE NAME HERE) -->
+<div style="text-align:center;">
+    <img src="../images/endologo-removebg-preview.png" class="logo" style="width:450px;">
+  </div>
+
+<h2 style="position: relative; top: -250px;">Period Tracker</h2>
+
+<div class="container">
+
+  <!-- CALENDAR -->
+  <div class="box calendar-box">
+    <div id="calendar"></div>
+    <button onclick="savePeriod()">Save</button>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="box journal">
+    <h3>Your Journal</h3>
+    <div id="entries"></div>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { customAlert, customConfirm, customPrompt } from "../js/ui.js";
+
+ const firebaseConfig = {
+    apiKey: "AIzaSyAYIMBpNnGhcy-wzjmUtmOsBo9hU7vfrsc",
+    authDomain: "endocycle-43b86.firebaseapp.com",
+    projectId: "endocycle-43b86",
+    storageBucket: "endocycle-43b86.firebasestorage.app",
+    messagingSenderId: "253560551444",
+    appId: "1:253560551444:web:2ea0d511969ed8c4188f01"
+  };
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// GLOBAL VARIABLES
+let selectedStart = null;
+let selectedEnd = null;
+let calendar;
+let selectionEvent = null;
+
+// CALENDAR
+document.addEventListener('DOMContentLoaded', function () {
+
+  const calendarEl = document.getElementById('calendar');
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    selectable: true,
+
+    select: function(info) {
+
+  // REMOVE OLD TEMP SELECTION
+  if (selectionEvent) {
+    selectionEvent.remove();
+  }
+
+  selectedStart = info.startStr;
+  let exc = new Date(info.endStr);
+  exc.setDate(exc.getDate() - 1);
+  selectedEnd = exc.toISOString().split('T')[0];
+  var selectedEndStrRawForCalendar = info.endStr;
+
+  // ADD NEW TEMP SELECTION
+  selectionEvent = calendar.addEvent({
+    start: selectedStart,
+    end: selectedEndStrRawForCalendar,
+    display: "background",
+    color: "#E381B5"
+  });
+
+  // CLEAR default blue highlight (VERY IMPORTANT)
+  calendar.unselect();
+}
+  });
+
+  calendar.render();
+  
+  loadEntries();
+
+  // SAVE BUTTON
+ window.savePeriod = async function() {
+
+  if (!selectedStart || !selectedEnd) {
+    customAlert("Please select a range");
+    return;
+  }
+
+  await addDoc(collection(db, "periods"), {
+    start: selectedStart,
+    end: selectedEnd,
+    createdAt: new Date()
+  });
+  selectedStart = null;
+selectedEnd = null;
+
+if (selectionEvent) {
+  selectionEvent.remove();
+  selectionEvent = null;
+}
+
+  customAlert("Saved 💖");
+
+  loadEntries(); // 🔥 reload journal immediately
+}});
+window.deleteEntry = async function(id) {
+console.log("DELETE CLICKED:", id)
+
+  if (!(await customConfirm("Delete this entry?"))) return;
+
+  await deleteDoc(doc(db, "periods", id));
+
+  customAlert("Deleted 🗑️");
+
+  loadEntries();
+};
+window.editEntry = async function(id, oldStart, oldEnd) {
+
+console.log("EDIT CLICKED:", id)
+  let newStart = prompt("Enter new start date (YYYY-MM-DD)", oldStart);
+  let newEnd = prompt("Enter new end date (YYYY-MM-DD)", oldEnd);
+
+  if (!newStart || !newEnd) return;
+
+  await updateDoc(doc(db, "periods", id), {
+    start: newStart,
+    end: newEnd
+  });
+
+  customAlert("Updated ✏️");
+
+  loadEntries();
+};
+async function loadEntries() {
+
+  const snapshot = await getDocs(collection(db, "periods"));
+
+  let entries = [];
+
+  snapshot.forEach(docSnap => {
+    entries.push({
+        id: docSnap.id,
+        ...docSnap.data()
+        });
+  });
+
+  entries.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+  let html = "";
+
+  for (let i = 0; i < entries.length; i++) {
+
+    let start = new Date(entries[i].start);
+    let end = new Date(entries[i].end);
+
+    let length = Math.round((end - start)/(1000*60*60*24)) + 1;
+
+    let cycle = "-";
+    if (i > 0) {
+      let prevStart = new Date(entries[i-1].start);
+      cycle = Math.round((start - prevStart)/(1000*60*60*24)) + " days";
+    }
+
+    html += `
+  <div class="entry">
+    <b>${entries[i].start} → ${entries[i].end}</b><br>
+    🩸 ${length} days<br>
+    🔄 ${cycle}<br><br>
+
+    <button onclick="editEntry('${entries[i].id}', '${entries[i].start}', '${entries[i].end}')"> Edit</button>
+    <button onclick="deleteEntry('${entries[i].id}')"> Delete</button>
+  </div>
+`;
+
+    // ALSO SHOW ON CALENDAR
+    calendar.addEvent({
+      start: entries[i].start,
+      end: (function(){ let d = new Date(entries[i].end); d.setDate(d.getDate()+1); return d.toISOString().split("T")[0]; })(),
+      display: "background",
+      color: "#ffc0cb"
+    });
+  }
+
+  document.getElementById("entries").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+

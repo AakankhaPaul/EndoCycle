@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>EndoCycle Home</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("../images/endoback.jpeg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: linear-gradient(to right, #ffffffcc, #fff0f5cc);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 40px;
+    }
+
+    .logo span {
+      font-size: 22px;
+      font-weight: 600;
+      color: #E381B5;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 25px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #E381B5;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #d45a9f;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      text-align: center;
+      margin-top: 100px;
+      color: #E381B5;
+    }
+
+    .hero h1 {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* BUTTONS */
+    .buttons {
+      margin-top: 30px;
+    }
+
+    .buttons a {
+      text-decoration: none;
+      background: linear-gradient(45deg, #E381B5, #f5a3c7);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 15px;
+      margin: 10px;
+      display: inline-block;
+    }
+
+    /* CARD SECTION */
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 80px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      width: 250px;
+      background: linear-gradient(to bottom, #ffffff, #fff0f5);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    a.card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    a.card-link:hover .card {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .card h3 {
+      color: #E381B5;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+  <div class="logo">
+    <img src="../images/endologo-removebg-preview.png">
+    <span>EndoCycle</span>
+  </div>
+
+  <div class="nav-links">
+    <a href="home.html">Home</a>
+    <a href="feed.html">Feed</a>
+    <a href="my-posts.html">My Posts</a>
+    <a href="chat.html">Messages</a>
+    <a href="chatbot.html">AI Assistant</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Welcome to EndoCycle 🌸</h1>
+  <p>Your safe space for tracking, sharing & understanding your cycle</p>
+  <div class="buttons">
+    <a href="my-posts.html">My Posts</a>
+    <a href="feed.html">Explore Feed</a>
+    <a href="chatbot.html">AI Assistant</a>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+
+  <a href="my-posts.html" class="card-link">
+    <div class="card">
+      <h3>📝 My Posts</h3>
+      <p>View, manage, and delete your community posts</p>
+    </div>
+  </a>
+
+  <a href="chat.html" class="card-link">
+    <div class="card">
+      <h3>💬 Community</h3>
+      <p>Share experiences and connect with others</p>
+    </div>
+  </a>
+
+
+
+  <a href="endo-book.html" class="card-link">
+    <div class="card">
+        <h3>📖 Endo Book</h3>
+        <p>Read about conditions, sanitation, and facts</p>
+    </div>
+  </a>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAYIMBpNnGhcy-wzjmUtmOsBo9hU7vfrsc",
+  authDomain: "endocycle-43b86.firebaseapp.com",
+  projectId: "endocycle-43b86",
+  storageBucket: "endocycle-43b86.firebasestorage.app",
+  messagingSenderId: "253560551444",
+  appId: "1:253560551444:web:2ea0d511969ed8c4188f01"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔐 CHECK LOGIN
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // NOT LOGGED IN → redirect
+    window.location.href = "../index.html"; // your login page
+  }
+});
+
+// 🚪 LOGOUT
+window.logout = function() {
+  signOut(auth);
+  window.location.href = "../index.html";
+};
+
+</script>
+</body>
+</html>
