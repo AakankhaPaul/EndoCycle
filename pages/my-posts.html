@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Posts – EndoCycle</title>
+  <meta name="description" content="View and manage your EndoCycle community posts — track engagement, read responses, and manage your content.">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ── RESET & BASE ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:      #E381B5;
+      --pink-dark: #c9629c;
+      --pink-light:#f5a3c7;
+      --pink-pale: #fff0f5;
+      --rose:      #ffebf3;
+      --text:      #3d2030;
+      --muted:     #9a7a8a;
+      --border:    #f0d6e5;
+      --up:        #e84393;
+      --down:      #7c5c6e;
+      --glass:     rgba(255,255,255,0.72);
+      --shadow:    0 8px 32px rgba(180,60,110,0.13);
+      --green:     #00b894;
+      --red:       #d63031;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url("../images/endoback.jpeg") no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ── NAVBAR ────────────────────────────────────── */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 40px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 20px rgba(180,60,110,0.10);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo img { width: 38px; }
+    .logo span { font-size: 21px; font-weight: 700; color: var(--pink); }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { text-decoration: none; color: var(--pink); font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--pink-dark); }
+
+    /* ── PAGE LAYOUT ──────────────────────────────── */
+    .page-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--pink);
+    }
+    .page-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* ── INSIGHTS DASHBOARD ──────────────────────── */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .insight-card {
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .insight-card:hover { transform: translateY(-3px); box-shadow: 0 14px 42px rgba(180,60,110,0.18); }
+    .insight-icon {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 18px;
+    }
+    .insight-icon.posts  { background: linear-gradient(135deg, var(--pink), var(--pink-light)); color: white; }
+    .insight-icon.up     { background: linear-gradient(135deg, #e84393, #fd79a8); color: white; }
+    .insight-icon.down   { background: linear-gradient(135deg, #7c5c6e, #b2809e); color: white; }
+    .insight-icon.engage { background: linear-gradient(135deg, #00b894, #55efc4); color: white; }
+    .insight-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .insight-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* ── SORT / FILTER BAR ──────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .toolbar-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-right: 4px;
+    }
+    .sort-btn {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sort-btn:hover { border-color: var(--pink); color: var(--pink); }
+    .sort-btn.active {
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: white;
+      border-color: transparent;
+    }
+
+    /* ── POST CARD ────────────────────────────────── */
+    .post-card {
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+      animation: fadeUp 0.35s ease both;
+    }
+    .post-card:hover { box-shadow: 0 14px 42px rgba(180,60,110,0.2); transform: translateY(-2px); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .post-body { padding: 18px 20px 14px; }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .post-meta .avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: white; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .cat-tag {
+      background: var(--rose);
+      color: var(--pink-dark);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .post-time { margin-left: auto; }
+
+    .post-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .post-content {
+      font-size: 14px;
+      color: #5a3d4b;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    /* ── POST STATS BAR ─────────────────────────── */
+    .post-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px 14px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .stat-chip i { font-size: 14px; }
+    .stat-chip.up-stat i   { color: var(--up); }
+    .stat-chip.down-stat i { color: var(--down); }
+    .stat-chip.comment-stat i { color: var(--pink); }
+    .stat-chip .stat-val {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .net-score {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--pink-pale);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .net-score.positive { color: var(--up); }
+    .net-score.negative { color: var(--down); }
+    .net-score.neutral  { color: var(--muted); }
+
+    /* ── ACTION BUTTONS ─────────────────────────── */
+    .post-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px 14px;
+    }
+    .action-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 6px 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: border-color 0.18s, color 0.18s, background 0.18s;
+    }
+    .action-btn:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-pale); }
+    .action-btn.delete-btn:hover { border-color: var(--red); color: var(--red); background: #fff5f5; }
+    .action-btn.delete-btn i { color: var(--red); }
+
+    /* ── COMMENTS / RESPONSES SECTION ───────────── */
+    .responses-section {
+      display: none;
+      padding: 0 20px 16px;
+      border-top: 1px solid var(--border);
+      animation: fadeIn 0.25s ease;
+    }
+    .responses-section.open { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    .responses-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pink-dark);
+      margin: 14px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .responses-header i { font-size: 14px; }
+
+    .comment-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      animation: fadeIn 0.25s ease;
+    }
+    .comment-item .c-avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink-light), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: white; font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .comment-bubble {
+      flex: 1;
+      background: var(--pink-pale);
+      border-radius: 14px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+    }
+    .comment-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .comment-author {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--pink-dark);
+    }
+    .comment-time { font-size: 11px; color: var(--muted); }
+    .comment-text { font-size: 13px; color: var(--text); line-height: 1.55; }
+
+    .comment-vote-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .comment-vote-info i { font-size: 11px; }
+    .comment-vote-info .cv-up { color: var(--up); }
+    .comment-vote-info .cv-down { color: var(--down); }
+
+    /* ── NESTED REPLIES ──────────────────────────── */
+    .replies-container {
+      margin-top: 8px;
+      margin-left: 0;
+      padding-left: 14px;
+      border-left: 2px solid var(--border);
+    }
+
+    .no-responses {
+      text-align: center;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── EMPTY STATE ───────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state i { font-size: 48px; color: var(--pink-light); margin-bottom: 14px; display: block; }
+    .empty-state p { font-size: 15px; margin-bottom: 8px; }
+    .empty-state .sub { font-size: 13px; }
+    .empty-state a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: white;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 16px rgba(227,129,181,0.35);
+      transition: opacity 0.2s, transform 0.18s;
+    }
+    .empty-state a:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    /* ── LOADING ──────────────────────────────────── */
+    .loading-state {
+      text-align: center;
+      padding: 50px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(180,60,110,0.3);
+      transition: transform 0.35s cubic-bezier(.4,2,.6,1), opacity 0.35s;
+      opacity: 0;
+      z-index: 999;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ── CONFIRM MODAL ──────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(60,20,40,0.45);
+      backdrop-filter: blur(6px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 32px;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(180,60,110,0.25);
+      text-align: center;
+      animation: fadeUp 0.3s ease;
+    }
+    .modal-box i {
+      font-size: 38px;
+      color: var(--red);
+      margin-bottom: 14px;
+    }
+    .modal-box h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .modal-box p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .modal-actions button {
+      padding: 9px 20px;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.18s;
+      border: none;
+    }
+    .modal-cancel {
+      background: var(--pink-pale);
+      color: var(--muted);
+    }
+    .modal-confirm {
+      background: linear-gradient(135deg, var(--red), #e17055);
+      color: white;
+      box-shadow: 0 4px 16px rgba(214,48,49,0.3);
+    }
+    .modal-actions button:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 700px) {
+      .insights-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .navbar { padding: 12px 18px; }
+      .nav-links { gap: 14px; }
+      .page-wrap { padding: 18px 10px 50px; }
+      .insights-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .post-stats { gap: 10px; }
+      .post-actions-bar { flex-wrap: wrap; gap: 6px; }
+    }
+    @media (max-width: 400px) {
+      .insights-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a href="home.html" class="logo">
+    <img src="../images/endologo-removebg-preview.png" alt="EndoCycle Logo">
+    <span>EndoCycle</span>
+  </a>
+  <div class="nav-links">
+    <a href="home.html">Home</a>
+    <a href="feed.html">Feed</a>
+    <a href="my-posts.html" class="active">My Posts</a>
+    <a href="chat.html">Messages</a>
+    <a href="chatbot.html">AI Assistant</a>
+    <a href="#" id="logoutBtn">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div>
+      <h1>📝 My Posts</h1>
+      <p>Track your engagement, responses, and manage your posts.</p>
+    </div>
+  </div>
+
+  <!-- ── INSIGHTS DASHBOARD ── -->
+  <div class="insights-grid" id="insightsGrid">
+    <div class="insight-card">
+      <div class="insight-icon posts"><i class="fa-solid fa-pen-nib"></i></div>
+      <div class="insight-value" id="totalPosts">–</div>
+      <div class="insight-label">Total Posts</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon up"><i class="fa-solid fa-arrow-up"></i></div>
+      <div class="insight-value" id="totalUpvotes">–</div>
+      <div class="insight-label">Upvotes Received</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon down"><i class="fa-solid fa-arrow-down"></i></div>
+      <div class="insight-value" id="totalDownvotes">–</div>
+      <div class="insight-label">Downvotes</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon engage"><i class="fa-solid fa-comments"></i></div>
+      <div class="insight-value" id="totalComments">–</div>
+      <div class="insight-label">Responses</div>
+    </div>
+  </div>
+
+  <!-- ── SORT TOOLBAR ── -->
+  <div class="toolbar">
+    <span class="toolbar-label">Sort by:</span>
+    <button class="sort-btn active" data-sort="new" id="sort-new">✨ Newest</button>
+    <button class="sort-btn" data-sort="top" id="sort-top">⬆️ Most Voted</button>
+    <button class="sort-btn" data-sort="engage" id="sort-engage">💬 Most Engaged</button>
+  </div>
+
+  <!-- ── MY POSTS FEED ── -->
+  <div id="myPostsContainer">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your posts…</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <h3>Delete this post?</h3>
+    <p>This action cannot be undone. All votes and comments on this post will also be removed.</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="modalCancel">Cancel</button>
+      <button class="modal-confirm" id="modalConfirm"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCRIPT ── -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, getDoc, deleteDoc,
+  doc, query, orderBy, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+/* ── FIREBASE INIT ── */
+import ENV from "../config.js";
+const firebaseConfig = {
+  apiKey: ENV.FIREBASE_API_KEY,
+  authDomain: ENV.FIREBASE_AUTH_DOMAIN,
+  projectId: ENV.FIREBASE_PROJECT_ID,
+  storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: ENV.FIREBASE_MESSAGING_ID,
+  appId: ENV.FIREBASE_APP_ID
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+/* ── STATE ── */
+let currentUser  = null;
+let currentSort  = "new";
+let myPosts      = [];     // { id, data, comments[] }
+let unsubPosts   = null;
+let deleteTarget = null;   // postId queued for deletion
+
+/* ── AUTH CHECK ── */
+onAuthStateChanged(auth, user => {
+  if (!user) { window.location.href = "../index.html"; return; }
+  currentUser = user;
+  startListening();
+});
+
+document.getElementById("logoutBtn").onclick = () => {
+  signOut(auth); window.location.href = "../index.html";
+};
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+/* ── TIME FORMATTER ── */
+function timeAgo(ts) {
+  if (!ts) return "";
+  const date = ts.toDate ? ts.toDate() : new Date(ts);
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diff < 60)  return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
+
+/* ── ESCAPE HTML ── */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/\n/g,"<br>");
+}
+
+/* ── SCORE HELPER ── */
+function score(item) {
+  const up   = (item.upvotes   || []).length;
+  const down = (item.downvotes || []).length;
+  return up - down;
+}
+
+/* ── REAL-TIME LISTENER (filtered to current user) ── */
+function startListening() {
+  const postsRef = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  if (unsubPosts) unsubPosts();
+
+  unsubPosts = onSnapshot(postsRef, async snapshot => {
+    const posts = [];
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data();
+      // Only include posts by the current user
+      if (data.authorId !== currentUser.uid) continue;
+
+      const commentsSnap = await getDocs(
+        query(collection(db, "posts", docSnap.id, "comments"), orderBy("createdAt", "asc"))
+      );
+      const comments = commentsSnap.docs.map(c => ({ id: c.id, ...c.data() }));
+      posts.push({ id: docSnap.id, data, comments });
+    }
+    myPosts = posts;
+    updateInsights();
+    renderMyPosts();
+  });
+}
+
+/* ── UPDATE INSIGHTS ── */
+function updateInsights() {
+  let totalUp = 0, totalDown = 0, totalComments = 0;
+
+  myPosts.forEach(p => {
+    totalUp   += (p.data.upvotes   || []).length;
+    totalDown += (p.data.downvotes || []).length;
+    totalComments += p.comments.length;
+    // Count nested replies too
+    p.comments.forEach(c => {
+      totalComments += (c.replies || []).length;
+    });
+  });
+
+  document.getElementById("totalPosts").textContent    = myPosts.length;
+  document.getElementById("totalUpvotes").textContent   = totalUp;
+  document.getElementById("totalDownvotes").textContent = totalDown;
+  document.getElementById("totalComments").textContent  = totalComments;
+}
+
+/* ── SORT POSTS ── */
+function sortedPosts(posts) {
+  const copy = [...posts];
+  if (currentSort === "new") return copy;
+  if (currentSort === "top") return copy.sort((a,b) => score(b.data) - score(a.data));
+  if (currentSort === "engage") return copy.sort((a,b) => {
+    const engA = a.comments.length + (a.data.upvotes||[]).length + (a.data.downvotes||[]).length;
+    const engB = b.comments.length + (b.data.upvotes||[]).length + (b.data.downvotes||[]).length;
+    return engB - engA;
+  });
+  return copy;
+}
+
+/* ── RENDER MY POSTS ── */
+function renderMyPosts() {
+  const container = document.getElementById("myPostsContainer");
+  const posts = sortedPosts(myPosts);
+
+  if (posts.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <p>You haven't posted anything yet.</p>
+        <p class="sub">Share your first story with the community!</p>
+        <a href="create-post.html"><i class="fa-solid fa-plus"></i> Create Your First Post</a>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = posts.map(p => buildPostHTML(p)).join("");
+}
+
+/* ── BUILD POST HTML ── */
+function buildPostHTML({ id, data, comments }) {
+  const upCount   = (data.upvotes   || []).length;
+  const downCount = (data.downvotes || []).length;
+  const netScore  = upCount - downCount;
+  const authorInit = data.anonymous ? "?" : (data.authorName || data.displayName || "U")[0].toUpperCase();
+  const authorName = data.anonymous || data.isAnonymous ? "Anonymous (You)" : (data.authorName || data.displayName || "You");
+
+  const scoreClass = netScore > 0 ? "positive" : netScore < 0 ? "negative" : "neutral";
+  const scorePrefix = netScore > 0 ? "+" : "";
+
+  const commentsHTML = comments.map(c => buildCommentHTML(id, c)).join("");
+  const totalResponses = comments.length + comments.reduce((acc, c) => acc + (c.replies || []).length, 0);
+
+  return `
+  <div class="post-card" id="post-${id}">
+    <div class="post-body">
+      <div class="post-meta">
+        <div class="avatar">${authorInit}</div>
+        <strong>${authorName}</strong>
+        <span class="cat-tag">${data.category || "General"}</span>
+        <span class="post-time">${timeAgo(data.createdAt)}</span>
+      </div>
+      <div class="post-title">${escHtml(data.title || "")}</div>
+      <div class="post-content">${escHtml(data.content || "")}</div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="post-stats">
+      <div class="stat-chip up-stat">
+        <i class="fa-solid fa-arrow-up"></i>
+        <span class="stat-val">${upCount}</span> upvotes
+      </div>
+      <div class="stat-chip down-stat">
+        <i class="fa-solid fa-arrow-down"></i>
+        <span class="stat-val">${downCount}</span> downvotes
+      </div>
+      <div class="stat-chip comment-stat">
+        <i class="fa-solid fa-comments"></i>
+        <span class="stat-val">${totalResponses}</span> responses
+      </div>
+      <div class="net-score ${scoreClass}">
+        <i class="fa-solid fa-chart-line"></i> ${scorePrefix}${netScore} net
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="post-actions-bar">
+      <button class="action-btn" onclick="toggleResponses('${id}')">
+        <i class="fa-solid fa-eye"></i> View Responses (${totalResponses})
+      </button>
+      <button class="action-btn" onclick="viewOnFeed('${id}')">
+        <i class="fa-solid fa-up-right-from-square"></i> Open in Feed
+      </button>
+      <button class="action-btn delete-btn" onclick="confirmDelete('${id}')">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </div>
+
+    <!-- Responses Section -->
+    <div class="responses-section" id="responses-${id}">
+      <div class="responses-header">
+        <i class="fa-solid fa-reply-all"></i>
+        Responses on this post
+      </div>
+      ${totalResponses === 0
+        ? `<div class="no-responses"><i class="fa-regular fa-comment-dots"></i> No responses yet — the community hasn't replied yet.</div>`
+        : commentsHTML
+      }
+    </div>
+  </div>
+  `;
+}
+
+/* ── BUILD COMMENT HTML ── */
+function buildCommentHTML(postId, comment) {
+  const authorInit = comment.anonymous ? "?" : (comment.authorName || "U")[0].toUpperCase();
+  const authorName = comment.anonymous ? "Anonymous" : (comment.authorName || "User");
+  const upCount   = (comment.upvotes   || []).length;
+  const downCount = (comment.downvotes || []).length;
+
+  const repliesHTML = (comment.replies || []).map(r => buildReplyHTML(r)).join("");
+
+  return `
+  <div class="comment-item">
+    <div class="c-avatar">${authorInit}</div>
+    <div style="flex:1">
+      <div class="comment-bubble">
+        <div class="comment-top">
+          <span class="comment-author">${authorName}</span>
+          <span class="comment-time">${timeAgo(comment.createdAt)}</span>
+        </div>
+        <div class="comment-text">${escHtml(comment.text || "")}</div>
+        <div class="comment-vote-info">
+          <span><i class="fa-solid fa-arrow-up cv-up"></i> ${upCount}</span>
+          <span><i class="fa-solid fa-arrow-down cv-down"></i> ${downCount}</span>
+        </div>
+      </div>
+      ${repliesHTML ? `<div class="replies-container">${repliesHTML}</div>` : ""}
+    </div>
+  </div>
+  `;
+}
+
+/* ── BUILD REPLY HTML ── */
+function buildReplyHTML(reply) {
+  const authorInit = reply.anonymous ? "?" : (reply.authorName || "U")[0].toUpperCase();
+  const authorName = reply.anonymous ? "Anonymous" : (reply.authorName || "User");
+  return `
+  <div class="comment-item" style="margin-bottom:8px;">
+    <div class="c-avatar" style="width:22px;height:22px;font-size:10px;">${authorInit}</div>
+    <div class="comment-bubble" style="flex:1">
+      <div class="comment-top">
+        <span class="comment-author">${authorName}</span>
+        <span class="comment-time">${timeAgo(reply.createdAt)}</span>
+      </div>
+      <div class="comment-text">${escHtml(reply.text || "")}</div>
+    </div>
+  </div>
+  `;
+}
+
+/* ── TOGGLE RESPONSES ── */
+window.toggleResponses = function(postId) {
+  const sec = document.getElementById(`responses-${postId}`);
+  if (sec) sec.classList.toggle("open");
+};
+
+/* ── VIEW ON FEED ── */
+window.viewOnFeed = function(postId) {
+  window.location.href = `feed.html#post-${postId}`;
+};
+
+/* ── DELETE (with modal) ── */
+const modal       = document.getElementById("deleteModal");
+const modalCancel = document.getElementById("modalCancel");
+const modalConfirm= document.getElementById("modalConfirm");
+
+window.confirmDelete = function(postId) {
+  deleteTarget = postId;
+  modal.classList.add("open");
+};
+
+modalCancel.onclick = () => {
+  deleteTarget = null;
+  modal.classList.remove("open");
+};
+
+modalConfirm.onclick = async () => {
+  if (!deleteTarget) return;
+  modal.classList.remove("open");
+
+  try {
+    // Delete all comments sub-collection first
+    const commentsSnap = await getDocs(collection(db, "posts", deleteTarget, "comments"));
+    for (const cDoc of commentsSnap.docs) {
+      await deleteDoc(doc(db, "posts", deleteTarget, "comments", cDoc.id));
+    }
+    // Delete the post
+    await deleteDoc(doc(db, "posts", deleteTarget));
+
+    // Remove from DOM immediately
+    const el = document.getElementById(`post-${deleteTarget}`);
+    if (el) {
+      el.style.transition = "opacity 0.3s, transform 0.3s";
+      el.style.opacity = "0";
+      el.style.transform = "translateY(-10px)";
+      setTimeout(() => el.remove(), 300);
+    }
+
+    showToast("Post deleted successfully 🗑️");
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    showToast("Failed to delete post. Please try again.");
+  }
+
+  deleteTarget = null;
+};
+
+// Close modal on overlay click
+modal.addEventListener("click", e => {
+  if (e.target === modal) {
+    deleteTarget = null;
+    modal.classList.remove("open");
+  }
+});
+
+/* ── SORT BUTTONS ── */
+document.querySelectorAll(".sort-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentSort = btn.dataset.sort;
+    renderMyPosts();
+  });
+});
+
+</script>
+
+</body>
+</html>
