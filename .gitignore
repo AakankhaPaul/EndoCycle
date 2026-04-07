@@ -1,6 +1,5 @@
 # API Keys — never commit these
 .env
-config.js
 
 # OS / Editor files
 .DS_Store
