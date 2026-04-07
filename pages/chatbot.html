@@ -263,39 +263,9 @@ import ENV from "../config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- GEMINI AI INTEGRATION ---
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+// --- API INTEGRATION ---
+// We now call our secure backend route instead of using the SDK from the frontend
 
-const firebaseConfig = {
-  apiKey: ENV.FIREBASE_API_KEY,
-  authDomain: ENV.FIREBASE_AUTH_DOMAIN,
-  projectId: ENV.FIREBASE_PROJECT_ID,
-  storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: ENV.FIREBASE_MESSAGING_ID,
-  appId: ENV.FIREBASE_APP_ID
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "../index.html"; 
-  }
-});
-
-document.getElementById('logout-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    signOut(auth).then(() => {
-        window.location.href = "../index.html";
-    });
-});
-
-
-// API Key loaded from config.js
-const genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY);
-
-// Define System Instructions for the specialized AI role
 const systemInstruction = `You are an empathetic, knowledgeable, and caring AI assistant specializing in female menstrual and reproductive health. 
 Your primary app is called "EndoCycle", which helps women track their cycles and conditions like Endometriosis or PCOS.
 Provide safe, factual, comforting, and clear advice. 
@@ -303,31 +273,17 @@ Use a warm, supportive tone. You can use occasional emojis like 🌸, 💖, or �
 Keep answers well-structured using short paragraphs, bullet points when necessary, and bold text for key terms.
 CRITICAL RULE: Always remind the user that you are an AI and they should consult a healthcare professional or doctor for serious medical concerns or accurate diagnosis.`;
 
-let chatSession;
-
-async function initChat() {
-    try {
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-2.5-flash"
-        });
-        chatSession = model.startChat({
-            history: [
-                {
-                    role: "user",
-                    parts: [{ text: "System Instruction: " + systemInstruction + " Acknowledge this." }]
-                },
-                {
-                    role: "model",
-                    parts: [{ text: "Understood. I am your EndoCycle AI Assistant." }]
-                }
-            ],
-        });
-    } catch (e) {
-        console.error("Error initializing model:", e);
+// Maintain local conversation state
+let chatHistory = [
+    {
+        role: "user",
+        parts: [{ text: "System Instruction: " + systemInstruction + " Acknowledge this." }]
+    },
+    {
+        role: "model",
+        parts: [{ text: "Understood. I am your EndoCycle AI Assistant." }]
     }
-}
-
-initChat();
+];
 
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
@@ -336,11 +292,8 @@ const typingIndicator = document.getElementById('typing-indicator');
 
 // Parse markdown-like bolding **text** to HTML <strong>text</strong>
 function formatMessage(text) {
-    // Replace **bold** with <strong>bold</strong>
     let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Replace *italic* with <em>italic</em>
     formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Replace newlines with <br>
     formatted = formatted.replace(/\n/g, '<br>');
     return formatted;
 }
@@ -350,10 +303,7 @@ function appendMessage(text, sender) {
     msgDiv.className = `message ${sender}`;
     msgDiv.innerHTML = formatMessage(text);
     
-    // Insert before typing indicator
     chatMessages.insertBefore(msgDiv, typingIndicator);
-    
-    // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
@@ -361,34 +311,44 @@ async function handleSend() {
     const text = userInput.value.trim();
     if (!text) return;
     
-    // Disable inputs
     userInput.value = '';
     userInput.disabled = true;
     sendBtn.disabled = true;
     
-    // User message
     appendMessage(text, 'user');
     
-    // Show typing
     typingIndicator.style.display = 'block';
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
     try {
-        const result = await chatSession.sendMessage(text);
-        const responseText = result.response.text();
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                history: chatHistory,
+                message: text
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch response');
+        }
         
-        // Hide typing
         typingIndicator.style.display = 'none';
-        
-        // Bot message
-        appendMessage(responseText, 'bot');
+        appendMessage(data.text, 'bot');
+
+        // Append to local history for future context
+        chatHistory.push({ role: "user", parts: [{ text }] });
+        chatHistory.push({ role: "model", parts: [{ text: data.text }] });
+
     } catch (error) {
         console.error("AI Error:", error);
         typingIndicator.style.display = 'none';
         appendMessage("Error: " + error.message, 'bot');
     }
     
-    // Enable inputs
     userInput.disabled = false;
     sendBtn.disabled = false;
     userInput.focus();
