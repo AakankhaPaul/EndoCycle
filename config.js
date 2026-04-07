@@ -13,8 +13,9 @@ const ENV = {
   FIREBASE_MESSAGING_ID: "253560551444",
   FIREBASE_APP_ID: "1:253560551444:web:2ea0d511969ed8c4188f01",
 
-  // Google Gemini AI key — paste your NEW key from https://aistudio.google.com/app/apikey
-  GEMINI_API_KEY: "AIzaSyCAAXm_D2kysLI-Lj71ng7RGmgCgufGdr0",
+  // Google Gemini AI key — REMOVED: Do not put secret keys in this file as it is tracked by Git.
+  // We will move this to a secure Vercel Serverless Function instead.
+  GEMINI_API_KEY: "",
 };
 
 export default ENV;
